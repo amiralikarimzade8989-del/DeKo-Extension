@@ -99,7 +99,6 @@ function relativeTime(ts) {
 
 function prettySource(s) {
   return String(s || '')
-    .replace(/arzdigital\.com/g, 'arzdigital')
     .replace(/tgju\.org full \(Rial\/10\)/g, 'tgju')
     .replace(/tgju\.org \(Rial\/10\)/g, 'tgju')
     .replace(/rate-json\/default/g, 'rate-json')
@@ -166,18 +165,6 @@ function setChangeChip(el, ch) {
 }
 
 /** Tiny area+line SVG from real closes (oldest -> newest). Colored by trend. */
-/* v2.5: the 7-day closes come from tgju while the live value may come from
- * arzdigital — the drawn spark must still END at the value actually shown,
- * otherwise the end dot visually hangs away from the big number. The stored
- * history stays source-pure; the current point is appended at DRAW time. */
-function withLive(points, current) {
-  if (!Array.isArray(points) || !points.length) return points;
-  if (!Number.isFinite(current) || current <= 0) return points;
-  const last = points[points.length - 1];
-  if (Math.abs(last - current) / current <= 0.001) return points;
-  return points.concat([current]);
-}
-
 function sparkSVG(points, up) {
   if (!Array.isArray(points) || points.length < 2) return '';
   const w = 100;
@@ -247,22 +234,14 @@ function render() {
   const ch = ratesCache && ratesCache.changes ? ratesCache.changes.USD : null;
   const hist = ratesCache && ratesCache.history ? ratesCache.history.USD : null;
   setChangeChip(document.getElementById('usdChg'), ch);
-  setSpark(document.getElementById('usdSpark'),
-    withLive(hist, r ? r.usdToToman : null), ch ? ch.up : null);
+  setSpark(document.getElementById('usdSpark'), hist, ch ? ch.up : null);
 
   renderGrid(r ? r.perCurrency : null);
   renderSources(ratesCache ? ratesCache.source : '');
 
   const stale = document.getElementById('stale');
-  /* v2.5: freshness is measured from OUR last fetch attempt, not the
-   * source's own timestamp — arzdigital serves its index from a short
-   * server-side cache, so the page's internal stamp can lag a few minutes
-   * behind even a fetch that happened just now. From the user's point of
-   * view "updated" = "we just went and got the latest available rates". */
-  const touchedAt = ratesCache
-    ? Math.max(ratesCache.lastAttempt || 0, ratesCache.updatedAt || 0)
-    : 0;
-  const isStale = ratesCache && (ratesCache.stale || (Date.now() - touchedAt) > STALE_AFTER_MS);
+  const isStale = ratesCache && (ratesCache.stale ||
+    (Date.now() - (ratesCache.updatedAt || 0)) > STALE_AFTER_MS);
   stale.classList.toggle('hidden', !isStale);
 
   updateTicker();
@@ -344,8 +323,7 @@ function renderGrid(per) {
     animateValue(val, per[code], fmtToman);
     setChangeChip(cell.querySelector('.chg'), changes[code]);
     const ch = changes[code];
-    setSpark(cell.querySelector('.spark'),
-      withLive(history[code], per[code]), ch ? ch.up : null);
+    setSpark(cell.querySelector('.spark'), history[code], ch ? ch.up : null);
   });
 }
 
@@ -381,10 +359,8 @@ function updateTicker() {
 
   const upd = document.getElementById('updated');
   if (ratesCache && ratesCache.rates) {
-    /* v2.5: freshness = our last fetch attempt (see renderAll note) */
-    const touchedAt = Math.max(ratesCache.lastAttempt || 0, ratesCache.updatedAt || 0);
     // pure Persian text here; the source chips live in their own LTR row
-    upd.textContent = 'بروزرسانی: ' + relativeTime(touchedAt);
+    upd.textContent = 'بروزرسانی: ' + relativeTime(ratesCache.updatedAt);
   } else {
     upd.textContent = 'هنوز نرخی دریافت نشده است';
   }

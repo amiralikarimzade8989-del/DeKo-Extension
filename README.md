@@ -1,153 +1,168 @@
-<div align="center">
+# DeKo – Toman Converter (v2.4.0)
 
-<img src="assets/banner.svg" width="100%" alt="banner" />
-
-<img src="https://img.shields.io/badge/version-2.5.0-14B8A6?style=for-the-badge" alt="version" />
-<img src="https://img.shields.io/badge/Chrome-Manifest%20V3-22D3EE?style=for-the-badge&logo=googlechrome&logoColor=white" alt="manifest v3" />
-<img src="https://img.shields.io/badge/Vanilla-JS-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="vanilla js" />
-<img src="https://img.shields.io/badge/Build%20step-none-8B5CF6?style=for-the-badge" alt="no build" />
-<img src="https://img.shields.io/badge/Tracking-none-22C55E?style=for-the-badge" alt="no tracking" />
-
-</div>
-
-<br/>
-
-**DeKo – Toman Converter** is a Chrome (Manifest V3) extension that detects foreign-currency prices on any web page and appends the **Iranian free-market Toman** equivalent right next to the original price. The original price is never modified.
+A Chrome (MV3) extension that detects foreign-currency prices on any page and
+appends the **Iranian free-market Toman** equivalent right next to the original
+price. The original price is never modified.
 
 ```
-$100       ->  $100 (≈ ۲۵٫۴ میلیون تومان)
-€106.99    ->  €106.99 (≈ ۳۰٫۸ میلیون تومان)
-$10 - $20  ->  $10 - $20 (≈ ۲٫۵ تا ۵٫۱ میلیون تومان)
+$100      ->  $100 (≈ ۲۵٫۴ میلیون تومان)
+€106.99   ->  €106.99 (≈ ۳۰٫۸ میلیون تومان)
+$10 - $20 ->  $10 - $20 (≈ ۲٫۵ تا ۵٫۱ میلیون تومان)
 ```
 
-<div dir="rtl" align="right">
+Vanilla JS. No build step. No framework. No tracking.
 
-**دِکو** یک افزونه کروم است که قیمت‌های ارزی (دلار، یورو و ...) را در هر سایت پیدا می‌کند و معادل **تومانی بازار آزاد** را کنار قیمت اصلی نشان می‌دهد. قیمت اصلی هیچ‌وقت تغییر نمی‌کند. افزونه دستیار هوشمند ارزی هم دارد.
+---
 
-</div>
+## Install (Load unpacked — 1 minute)
 
-<br/>
-
-<div align="center"><img src="assets/h-demo.svg" width="100%" alt="h-demo" /></div>
-
-<div align="center"><img src="assets/demo.svg" width="96%" alt="demo" /></div>
-
-<div align="center"><sub>Illustration of how prices look on a page. Examples use the values from the project notes; live rates change all day.</sub></div>
-
-<br/>
-
-<div align="center"><img src="assets/h-features.svg" width="100%" alt="h-features" /></div>
-
-<div align="center"><img src="assets/features.svg" width="96%" alt="features" /></div>
-
-<br/>
-
-<div align="center"><img src="assets/h-currencies.svg" width="100%" alt="h-currencies" /></div>
-
-<div align="center"><img src="assets/currencies.svg" width="100%" alt="currencies" /></div>
-
-USD, EUR, GBP, AED, TRY, CNY, CAD, AUD, JPY, INR, CHF, RUB, SAR, NZD, KRW and SEK.
-
-- Symbols, codes and Persian words: `$ € £ ¥ ₹ ₺`, `100 USD`, `۱۰۰ دلار`
-- Persian, Arabic and Latin digits, and formats like `1,299.99`, `1.299,99` and `1 299`
-- Multipliers such as `k`, `M`, `هزار`, `میلیون`, `میلیارد`
-- Ranges such as `$10 - $20` and `از ۱۰ تا ۲۰ دلار`
-- Amazon split prices and other symbol + number sibling splits
-- Single-page apps: a debounced `MutationObserver` plus idle-time chunked scanning
-
-<br/>
-
-<div align="center"><img src="assets/h-rates.svg" width="100%" alt="h-rates" /></div>
-
-<div align="center"><img src="assets/rates-flow.svg" width="96%" alt="rates-flow" /></div>
-
-Everything is kept in **Toman** internally (1 Toman = 10 Rial). Providers are tried as a chain:
-
-| Priority | Source | Role |
-|---|---|---|
-| 1 | `arzdigital.com` | Primary live anchor. One page fetch carries all 16 DeKo currencies as native free-market quotes |
-| 2 | `api.tgju.org` | Live anchor for 12 currencies, plus daily change % and 7-day history for chips and sparklines |
-| 3 | `rate-json` on GitHub | Daily free-market snapshot, used as a fallback and currency filler |
-| 4 | `open.er-api.com` | Cross-rate chain for every other currency |
-| 5 | Manual rates (Options) | Gap filler, or a full override |
-
-**Sanity rules:** only finite, positive values are accepted, and a move of more than 30% against a recent cached value is rejected. If a refresh fails, the cache keeps serving and is flagged **stale**.
-
-**Live updates:** `chrome.alarms` refreshes every 5 minutes. Opening a page asks the service worker for rates and starts a live pull if the last attempt is older than 3 minutes, while the page still paints instantly from cache. Every successful refresh is broadcast to all open tabs, and new badges pulse teal so you can see the update.
-
-<br/>
-
-<div align="center"><img src="assets/h-ai.svg" width="100%" alt="h-ai" /></div>
-
-<div align="center"><img src="assets/ai-chat.svg" width="96%" alt="ai-chat" /></div>
-
-**DeKo AI** is a dedicated offline engine (`deko-ai.js`) that answers Persian and English currency questions from the live rate cache:
-
-> «۱۰۰ دلار چنده؟» · «۲۵ میلیون تومان چند یورو میشه؟» · «نرخ پوند؟» · «روند دلار چطوره؟» · «دلار یا یورو؟»
-
-It reads Persian, Arabic and Latin digits, number words (`دو میلیون و پانصد هزار`), typos (`تومن`, `اورو`) and the symbols `$ € £ ¥`. Chat history is stored locally in `chrome.storage.local` and never sent anywhere.
-
-**Optional real LLM:** in Options you can connect any OpenAI-compatible endpoint (for example OpenRouter). The chat then uses that model with the live rates injected, and silently falls back to the built-in engine on any failure. The API key stays in your browser.
-
-<br/>
-
-<div align="center"><img src="assets/h-modes.svg" width="100%" alt="h-modes" /></div>
-
-| Option | Choices |
-|---|---|
-| Display mode | **append** (default), **replace**, **tooltip only** |
-| Digits | Persian or English |
-| Amount style | Compact (`۳۰٫۸ میلیون`) or full number |
-| Symbols | Choose how `$` and `¥` are interpreted |
-| Rates | Manual rates, with an optional full override |
-| Sites | Master switch, per-site switch, excluded sites |
-
-The popup shows a live USD hero with a daily change chip and a 7-day sparkline, a currency grid with flags, a refresh button and a stale warning. Dark-mode aware badges, RTL-isolated, with `deko-` prefixed DOM classes.
-
-<br/>
-
-<div align="center"><img src="assets/h-install.svg" width="100%" alt="h-install" /></div>
-
-<div align="center"><img src="assets/install-steps.svg" width="96%" alt="install-steps" /></div>
-
-1. Download or extract this folder (the folder that directly contains `manifest.json`).
-2. Open `chrome://extensions` in Chrome, or `edge://extensions` in Edge.
-3. Turn on **Developer mode** (top right).
+1. Download / extract this folder (the folder that directly contains `manifest.json`).
+2. Open `chrome://extensions` in Chrome (or `edge://extensions` in Edge).
+3. Turn on **Developer mode** (top-right).
 4. Click **Load unpacked** and select that folder.
-5. Visit any site with foreign prices.
+5. Done. Visit any site with foreign prices.
 
-<br/>
+## What v2 fixes
 
-<div align="center"><img src="assets/h-privacy.svg" width="100%" alt="h-privacy" /></div>
+- **The 1000× Amazon bug (v1):** Amazon splits one price across sibling spans
+  (`a-price-whole` / `a-price-fraction`) and hides a decimal inside "whole".
+  v1 composed `106..99`, which the number parser read as thousands → `10699`
+  → prices shown 1000× too large. v2 prefers Amazon's accessible
+  `.a-offscreen` full-price copy, strips the hidden trailing decimal, and
+  rejects malformed number groups (`11..13` → invalid). Regression-tested.
+
+## Rate providers (chain)
+
+| Priority | Source | Unit | Role |
+|---|---|---|---|
+| T | `api.tgju.org/v1/market/indicator/summary-table-data/{slug}?draw=1&start=0&length=8` | **Rial → /10 → Toman** | **primary LIVE anchor** — 12 NATIVE free-market quotes (USD EUR GBP AED TRY CNY CAD AUD JPY SAR INR CHF) in PARALLEL, plus daily change % and 7-day history |
+| A | `raw.githubusercontent.com/rate-json/default` data.json | Toman | daily free-market snapshot — fallback anchor + currency filler |
+| B | `open.er-api.com/v6/latest/USD` | units per USD | cross-rate chain for every other currency |
+| C | manual rates (options) | Toman | gap-filler; or full override |
+
+All feeds were fetched and cross-validated at build time (2026-10-01):
+`tgju price_dollar_rl close = 2,547,000 Rial = 254,700 Toman`; provider A's
+253,700 = the previous close. v2.3 verified the DataTables pagination
+(`?draw=1&start=0&length=8` → ~1 KB instead of ~600 KB of full history) and
+verified `price_jpy` is quoted **per 100 JPY** (cross-checked against
+er-api: ratio 99.78 ≈ 100) — the divisor is applied at the parse boundary.
+
+> Endpoint note: tgju's JSON API lives at
+> `/v1/market/indicator/summary-table-data/{slug}`; the older
+> `/v1/summary-table-data/{slug}` path returns 404.
+
+Sanity rules: finite/positive values only; USD must sit inside plausible
+absolute bounds; any move >30% vs a recent (<48h) cached value is rejected and
+the previous value is kept. Failed refreshes keep serving the cache flagged
+**stale**. Cache lives in `chrome.storage.local` under the `deko2_*` namespace.
+
+## Live updates (v2.2+)
+
+Rates are kept fresh **everywhere**, not just in the popup:
+
+- `chrome.alarms` auto-refresh every **5 minutes**.
+- Opening any page asks the service worker for rates with `fresh:'auto'` —
+  if the cache is older than 3 minutes a live pull starts immediately (the
+  page still paints instantly from cache, then re-renders when fresh rates
+  arrive).
+- Every successful refresh is **broadcast to all tabs**
+  (`DEKO_RATES_UPDATED`); open pages wipe + re-render their badges only when
+  the numbers really changed, and new badges pulse teal for a few seconds so
+  you can see the update happening.
+- Popup: full live refresh on open, silent auto-refresh every 60 s while
+  open, animated count-up numbers, live source chips.
+
+## DeKo AI assistant (v2.4) — ONE unified panel
+
+The popup is a SINGLE unified panel (no tabs, like the top open-source
+converter extensions): live USD hero + currency grid + the DeKo AI assistant
+card embedded in the same flow + status + toggles.
+
+- **DeKo AI** is a dedicated offline engine (`deko-ai.js`) that answers
+  Persian/English currency questions from the LIVE rate cache:
+  «۱۰۰ دلار چنده؟» · «۲۵ میلیون تومان چند یورو میشه؟» · «نرخ پوند؟» ·
+  «روند دلار چطوره؟» · «هفته پیش ۱۰۰۰ دلار خریده بودم، الان؟» · «دلار یا یورو؟»
+- Understands Persian/Arabic/Latin digits, ٫ decimals, ٬ thousands, number
+  words («دو میلیون و پانصد هزار»), typos («تومن», «اورو», «دلاره»), and
+  $ € £ ¥ symbols. Answers in Persian digits with ٬ / ٫ separators.
+- Chat history persists locally (chrome.storage.local); never sent anywhere.
+- **Optional real LLM:** in Options → "دستیار هوشمند DeKo AI" you can connect
+  any OpenAI-compatible endpoint (e.g. OpenRouter). The chat then uses that
+  model with DeKoAI.SYSTEM_PROMPT + the live rates injected; on any failure it
+  silently falls back to the built-in engine. The API key stays in your browser.
+- Quality gate: a seeded stress suite fires **exactly 10,000 generated
+  questions** (conversions, reverse conversions, rates, trends, profit/loss,
+  chit-chat, comparisons) — currently **10,000 / 10,000 correct**
+  (`scripts/test_deko_ai_10k.js`).
+
+## Persian numbers (v2.3)
+
+- The **Vazirmatn** font (SIL OFL 1.1) ships inside the extension
+  (`fonts/*.woff2`) and is used by the popup, options page AND the page
+  badges (exposed via `web_accessible_resources`). No more ugly system-font
+  Persian digits — crisp ۰-۹ with the standard ٬ thousands and ٫ decimal
+  separators everywhere.
+- Numbers are formatted with `Intl.NumberFormat('fa-IR')` — exactly what
+  Iranian financial sites use.
+- The popup shows a **daily change chip** (▲ green / ▼ red, from tgju's
+  high/low class) and a **7-day sparkline** built from real closes for the
+  dollar and every grid currency.
+
+## Features
+
+- Multi-currency: USD, EUR, GBP, AED, TRY, CNY, CAD, AUD, JPY, INR, CHF, RUB, SAR, NZD, KRW, SEK
+- Symbols, codes and Persian words (`$ € £ ¥ ₹ ₺ 100 USD ۱۰۰ دلار`)
+- Persian/Arabic digits, `1,299.99` / `1.299,99` / `1 299` formats, `k/M` and
+  `هزار/میلیون/میلیارد` multipliers, ranges (`$10 - $20`, `از ۱۰ تا ۲۰ دلار`)
+- Amazon split-price (`.a-price`) and generic symbol+number sibling splits
+- Display modes: **append** (default) / **replace** / **tooltip-only**
+- Persian or English digits; compact (`۳۰٫۸ میلیون`) or full number
+- Popup **v2.3 (aurora pro, animated live)**: bundled **Vazirmatn** font +
+  `fa-IR` number formatting, USD hero with **US flag chip**, **daily change
+  chip (▲/▼)** and **7-day sparkline**, 6-currency grid with **twemoji flag
+  chips, change chips and mini sparklines**, count-up number animations,
+  staggered card entrance, aurora background, rotating conic hero border,
+  floating flag, shimmer skeletons, sparkline draw-in animation, button
+  ripples, toast notifications, value-flash on change, LTR source chips
+  (tgju · rate-json · er-api), 60-second auto silent refresh with animated
+  progress bar + countdown, `prefers-reduced-motion` respected
+- Popup: master switch, per-site switch, stale warning, refresh-now button
+- Options: display mode, digit style, compact, `$`/`¥` interpretation,
+  manual rates + override, excluded sites
+- SPA-safe: MutationObserver (300 ms debounce) + idle-time chunked scanning
+- Dark-mode aware badge styling, RTL-isolated badges, `deko-` prefixed DOM
+
+## Privacy
 
 - No analytics, no accounts, no background tracking.
-- The only network calls are made by the service worker to the rate providers listed above. Your browsing history never leaves the browser.
-- All rates and chat history are cached locally in `chrome.storage.local` under the `deko2_*` namespace.
-- Permissions: `storage`, `alarms`, `activeTab`. Access to all sites is requested as an optional host permission.
+- The ONLY network calls are the three rate hosts above, made by the service
+  worker. Your browsing history never leaves the browser.
+- All rates are cached locally.
 
-Rates are shown for reference only.
+## Testing
 
-<br/>
+Open `dev/test.html` in a browser (or load the extension and visit any page):
+it contains a chrome-API shim, real-value fixtures (USD 253,700 / EUR 287,500,
+cross-checked against tgju) and **33 assertions** — including the v1
+regressions. Headless-Chromium result for this build: `ALL-PASS 33/33`.
 
-<div align="center"><img src="assets/h-files.svg" width="100%" alt="h-files" /></div>
+Additional automated verification for v2.3 (real network, real extension
+load):
 
-```
-DeKo-Extension/
-├── manifest.json     MV3 manifest
-├── background.js     provider chain, sanity checks, 5-minute alarms, tab broadcast
-├── content.js        price detection engine (+ content.css)
-├── deko-ai.js        offline DeKo AI assistant engine
-├── popup.html/js/css the unified popup panel
-├── options.html/js/css settings page
-├── icons/            extension icons
-├── fonts/            Vazirmatn (SIL OFL 1.1)
-└── flags/            currency flag icons
-```
+- background E2E: 15/15 — 12 native currencies, change % + 7-day history,
+  JPY divisor, broadcast, anti-churn, stale-kick, 5-min alarm
+- popup UI: 19/19 — Vazirmatn loads, fa-IR digits, flags, chips, sparklines,
+  count-up + flash, broadcast re-render
+- real-extension E2E (`--load-extension`): badges render on pages with the
+  bundled font loaded, real popup shows live USD ۲۵۴٬۷۰۰ from tgju
 
-**For developers:** to add a rate provider, implement `providerX()` returning `{ per: {CUR: toman}, updatedAt, source }` and wire it into `refreshRates()` in `background.js`. Remember: everything is Toman. Persian UI strings are grouped at the top of `content.js` (`STR`) for future i18n.
+## Notes for developers
 
-**v2 fix:** the 1000× Amazon price bug from v1 (a hidden decimal inside the "whole" span) is fixed. v2 prefers Amazon's accessible `.a-offscreen` full price and rejects malformed number groups.
-
-**Credits:** Vazirmatn font (SIL OFL 1.1). Rates from arzdigital, tgju, rate-json and open.er-api.
-
-<div align="center"><img src="assets/footer.svg" width="100%" alt="footer" /></div>
+- `background.js` — provider chain, sanity checks, `chrome.alarms` **5-min**
+  refresh, live tab broadcast, `DEKO_GET_RATES (fresh:'auto')` /
+  `DEKO_REFRESH` messaging.
+- `content.js` — detection engine. Persian UI strings are grouped at the top
+  (`STR`) for future i18n.
+- To add another provider: implement `providerX()` returning
+  `{ per: {CUR: toman}, updatedAt, source }` and wire it into `refreshRates()`.
+  Remember the unit: **everything is Toman** (1 Toman = 10 Rial).
