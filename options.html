@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>DeKo – تنظیمات</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1><span class="logo">DeKo</span> تنظیمات مبدل تومان</h1>
+
+    <section class="card">
+      <h2>رفتار کلی</h2>
+      <label class="row">
+        <span>افزونه فعال باشد</span>
+        <input type="checkbox" id="optEnabled">
+      </label>
+      <div class="row col">
+        <span>حالت نمایش معادل تومانی</span>
+        <div class="opts" id="optDisplayMode">
+          <label><input type="radio" name="displayMode" value="append" checked> کنار قیمت (پیش‌فرض)</label>
+          <label><input type="radio" name="displayMode" value="replace"> جایگزینی قیمت</label>
+          <label><input type="radio" name="displayMode" value="tooltip"> فقط با نگه‌داشتن ماوس (tooltip)</label>
+        </div>
+      </div>
+      <div class="row col">
+        <span>سبک اعداد</span>
+        <div class="opts">
+          <label><input type="radio" name="digits" value="fa" checked> فارسی (۲۵٫۴ میلیون)</label>
+          <label><input type="radio" name="digits" value="en"> انگلیسی (25.4 million)</label>
+        </div>
+      </div>
+      <label class="row">
+        <span>خلاصه‌نمایی اعداد (میلیون/میلیارد)</span>
+        <input type="checkbox" id="optCompact" checked>
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>تفسیر نمادها</h2>
+      <div class="row col">
+        <span>نماد «$» به‌تنهایی یعنی:</span>
+        <select id="optDollar">
+          <option value="USD">دلار آمریکا (USD)</option>
+          <option value="CAD">دلار کانادا (CAD)</option>
+          <option value="AUD">دلار استرالیا (AUD)</option>
+        </select>
+      </div>
+      <div class="row col">
+        <span>نماد «¥» به‌تنهایی یعنی:</span>
+        <select id="optYen">
+          <option value="JPY">ین ژاپن (JPY)</option>
+          <option value="CNY">یوان چین (CNY)</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>نرخ دستی (بر حسب تومان)</h2>
+      <p class="hint">اگر پر شود فقط ارزهای خالی را از نرخ آنلاین پر می‌کند؛ با تیک «فقط نرخ دستی» همه‌چیز از این جدول خوانده می‌شود.</p>
+      <label class="row">
+        <span>فقط از نرخ‌های دستی استفاده شود</span>
+        <input type="checkbox" id="optOverride">
+      </label>
+      <div class="grid" id="manualRates">
+        <!-- rows injected by options.js -->
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>دستیار هوشمند DeKo AI</h2>
+      <p class="hint">
+        دستیار داخل پنل افزونه به‌صورت پیش‌فرض با «موتور اختصاصی DeKo» کار می‌کند — کاملاً آفلاین، بدون ارسال هیچ داده‌ای.
+        اگر بخواهی می‌توانی یک مدل زبانی واقعی (LLM) هم به آن وصل کنی؛ هر سرویسِ سازگار با OpenAI (مثل OpenRouter) پشتیبانی می‌شود.
+      </p>
+      <label class="row">
+        <span>اتصال به LLM واقعی (اختیاری)</span>
+        <input type="checkbox" id="optAiEnabled">
+      </label>
+      <div class="row col">
+        <span>آدرس Endpoint (chat/completions)</span>
+        <input type="text" id="optAiEndpoint" dir="ltr" placeholder="https://openrouter.ai/api/v1/chat/completions">
+      </div>
+      <div class="row col">
+        <span>کلید API (فقط روی مرورگر خودت ذخیره می‌شود)</span>
+        <input type="password" id="optAiKey" dir="ltr" placeholder="sk-...">
+      </div>
+      <div class="row col">
+        <span>نام مدل</span>
+        <input type="text" id="optAiModel" dir="ltr" placeholder="meta-llama/llama-3.1-8b-instruct:free">
+      </div>
+      <div class="row">
+        <span>اجازهٔ دسترسی به دامنهٔ Endpoint</span>
+        <button id="optAiPermission" class="mini-btn" type="button">درخواست اجازه</button>
+      </div>
+      <p class="hint" id="optAiStatus"></p>
+    </section>
+
+    <section class="card">
+      <h2>سایت‌های مستثنی</h2>
+      <p class="hint">هر خط یک دامنه؛ مثلاً <code>amazon.de</code></p>
+      <textarea id="optSites" rows="5" spellcheck="false"></textarea>
+    </section>
+
+    <div class="actions">
+      <button id="save">ذخیره</button>
+      <span id="saved" class="saved hidden">ذخیره شد ✓</span>
+    </div>
+  </main>
+
+  <script src="options.js"></script>
+</body>
+</html>

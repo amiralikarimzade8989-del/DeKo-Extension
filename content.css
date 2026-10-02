@@ -1,0 +1,96 @@
+/* DeKo – Toman Converter — badge styles (all "deko-" prefixed) */
+
+/* Bundled Vazirmatn font — makes the Persian digits (۰-۹) and the Persian
+ * separators (٬ ٫) render crisply on EVERY page, instead of inheriting
+ * whatever ugly glyph the host page font has. __MSG_@@extension_id__ is
+ * substituted by Chrome in content-script CSS files; the font files are
+ * exposed via web_accessible_resources. (Vazirmatn — SIL OFL 1.1) */
+@font-face {
+  font-family: 'DeKoVazirmatn';
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DeKoVazirmatn';
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+span.deko-badge,
+.deko-badge {
+  display: inline-block;
+  direction: rtl;
+  unicode-bidi: isolate;
+  font-family: 'DeKoVazirmatn', Tahoma, Arial, sans-serif;
+  font-size: 0.88em;
+  line-height: 1.5;
+  padding: 0 0.3em;
+  margin-inline-start: 0.25em;
+  color: #0a7d43 !important;
+  background: rgba(16, 163, 74, 0.08);
+  border: 1px solid rgba(16, 163, 74, 0.28);
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 18em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: baseline;
+  cursor: help;
+  user-select: none;
+}
+
+.deko-badge:hover {
+  background: rgba(16, 163, 74, 0.16);
+}
+
+/* "replace" display mode: Toman takes the place of the original price */
+.deko-badge.deko-replaced {
+  color: #b45309 !important;
+  background: rgba(217, 119, 6, 0.10);
+  border-color: rgba(217, 119, 6, 0.35);
+  margin-inline-start: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .deko-badge {
+    color: #4ade80 !important;
+    background: rgba(74, 222, 128, 0.10);
+    border-color: rgba(74, 222, 128, 0.30);
+  }
+  .deko-badge.deko-replaced {
+    color: #fbbf24 !important;
+    background: rgba(251, 191, 36, 0.10);
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+}
+
+/* ---- v2.2 live animations ------------------------------------------------
+ * deko-pop : every badge slides/fades in softly when created (also on the
+ *            re-render after a live rate update, so the refresh is visible).
+ * deko-live: badges born right after a REAL rate change pulse with a teal
+ *            glow for a few seconds — the user sees the update happen.   */
+
+@keyframes deko-pop-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.deko-badge.deko-pop {
+  animation: deko-pop-in 0.28s ease-out both;
+}
+
+@keyframes deko-live-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.55); background: rgba(20, 184, 166, 0.30); }
+  60%  { box-shadow: 0 0 0 6px rgba(20, 184, 166, 0);  }
+  100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0);    }
+}
+
+.deko-badge.deko-live {
+  animation: deko-pop-in 0.28s ease-out both,
+             deko-live-glow 1.6s ease-out 3;
+  border-color: rgba(20, 184, 166, 0.55) !important;
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- animated aurora background -->
+  <div class="aurora" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
+
+  <header class="head">
+    <div class="brand">
+      <span class="logo">DeKo</span>
+      <span class="title">مبدل تومان</span>
+    </div>
+    <div class="head-actions">
+      <div class="live-chip">
+        <span class="pulse"></span>نرخ لحظه‌ای
+      </div>
+      <button id="openOptions" class="icon-btn" title="تنظیمات" aria-label="تنظیمات">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ======================= ONE unified panel ======================= -->
+  <main>
+    <!-- hero: USD -->
+    <section class="hero" id="hero">
+      <div class="hero-top">
+        <div class="who">
+          <span class="cur-chip"><img class="flag" src="flags/flag-us.svg" alt="USD" draggable="false"></span>
+          <div class="names">
+            <b>دلار آمریکا</b>
+            <small>USD · بازار آزاد</small>
+          </div>
+        </div>
+        <button id="refresh" class="icon-btn" title="بروزرسانی لحظه‌ای نرخ‌ها" aria-label="بروزرسانی نرخ‌ها">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+        </button>
+      </div>
+      <div class="hero-val">
+        <span class="num skel" id="usd">—</span>
+        <span class="unit">تومان</span>
+      </div>
+      <div class="hero-meta">
+        <span class="chg hidden" id="usdChg"></span>
+        <div class="spark" id="usdSpark" dir="ltr" title="روند ۷ روز اخیر دلار"></div>
+      </div>
+    </section>
+
+    <!-- secondary currencies -->
+    <section class="grid" id="grid"></section>
+
+    <!-- unified DeKo AI — جزء جداشدنی نیست، بخشی از همین پنله -->
+    <section class="ai-card" id="page-ai">
+      <div class="ai-head">
+        <span class="ai-avatar" aria-hidden="true">AI</span>
+        <div class="ai-names">
+          <b>دستیار DeKo</b>
+          <small><span class="ai-live-dot"></span><span id="aiStatus">آنلاین · متصل به نرخ زنده</span></small>
+        </div>
+        <button id="chatClear" class="icon-btn" title="پاک‌کردن گفتگو" aria-label="پاک‌کردن گفتگو">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+
+      <div class="chat" id="chat" aria-live="polite"></div>
+
+      <div class="chips" id="chips"></div>
+
+      <form class="composer" id="aiForm" autocomplete="off">
+        <input id="aiInput" type="text" placeholder="بپرس… مثلاً: ۱۰۰ دلار چنده؟" enterkeyhint="send" maxlength="200">
+        <button type="submit" id="aiSend" class="send-btn" aria-label="ارسال سؤال">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- live status -->
+    <section class="status">
+      <div class="line">
+        <span class="dot ok" id="statusDot"></span>
+        <span id="updated">در حال دریافت نرخ‌ها…</span>
+      </div>
+      <div class="srcs" id="srcs" dir="ltr"></div>
+      <div class="bar"><i id="bar"></i></div>
+      <div class="sub">بروزرسانی خودکار بعدی: <b id="next">۶۰</b> ثانیه دیگر</div>
+      <div class="warn hidden" id="stale">نرخ‌ها قدیمی‌اند؛ به‌محض وصل بودن اینترنت لحظه‌ای بروز می‌شوند</div>
+    </section>
+
+    <!-- toggles -->
+    <section class="toggles">
+      <label class="row">
+        <span class="lbl">فعال بودن افزونه</span>
+        <input type="checkbox" id="enabled" class="switch">
+      </label>
+      <label class="row" id="siteRow">
+        <span class="lbl">این سایت (<span id="host"></span>)</span>
+        <input type="checkbox" id="siteEnabled" class="switch">
+      </label>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="deko-ai.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
